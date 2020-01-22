@@ -1,43 +1,54 @@
-//jshint esversion:6
-
 const express = require("express");
 const bodyParser = require("body-parser");
-
-const date = require('./date')
+const mongoose = require('mongoose')
 
 const app = express();
-
-const items = ['Buy food', 'Cook food', 'Eat food']
-const workItems = []
 
 app.set('view engine', 'ejs')
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
 
+mongoose.connect('mongodb://localhost/todolistDB', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  })
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(error => console.log(error))
+
+const itemsSchema = {
+      name: String
+    };
+    
+const Item = mongoose.model('Item', itemsSchema)
+
 app.get("/", (req, res) => {
 
-  const day = date()
+  Item.find({}, (err, foundItems) => {
 
-  res.render('list', { 
-    listTitle: day,
-    newListItems: items
+      res.render('list', { 
+        listTitle: 'Today',
+        newListItems: foundItems
+      }) 
   })
+  
 });
 
 app.post('/', (req, res) => {
 
-  item = req.body.newItem
+  const itemName = req.body.newItem
 
-  if (req.body.list === 'Work') {
-    workItems.push(item)
-    res.redirect('work')
-  } else {
-    items.push(item)
-    res.redirect('/')
-  }
+  Item.create({name: itemName})
   
-  
+  res.redirect('/')
+})
+
+app.post('/delete', async (req, res) => {
+  const checkedItemId = req.body.checkbox
+
+  await Item.findByIdAndDelete(checkedItemId)
+
+  res.redirect('/')
 })
 
 app.get('/work', (req, res) => {

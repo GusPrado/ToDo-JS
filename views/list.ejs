@@ -6,16 +6,18 @@
 
 <div class="box">
 
-    <% for (content of newListItems) { %>
+<form action="/delete" method="POST">
+    <% newListItems.map(item => { %>
       <div class="item">
-        <input type="checkbox">
-        <p><%= content %></p>
+        <input type="checkbox" name="checkbox" value="<%= item._id %>" onChange="this.form.submit()">
+        <p><%= item.name %></p>
       </div>
-    <% } %>
+    <% }) %>
+</form>
 
   <form action="/" method="POST">
     <input type="text" name="newItem" placeholder="New item" autocomplete="off">
-    <button type="submit" name="button" value=<% s= listTitle %> >+</button>
+    <button type="submit" name="button" value=<% listTitle %> >+</button>
   </form>
 </div>
 
