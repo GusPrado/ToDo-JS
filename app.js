@@ -10,7 +10,7 @@ app.set('view engine', 'ejs')
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
 
-mongoose.connect('mongodb://localhost/todolistDB', {
+mongoose.connect('mongodb+srv://gusadmin:Atlas123@cluster0-jhqtw.mongodb.net/todolistDB', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   })
@@ -33,7 +33,7 @@ const Item2 = new Item ({
 })
 
 const Item3 = new Item ({
-  name: '<-- Hit this to delete a button'
+  name: '<-- Hit this to delete an item'
 })
 
 const defaultItems = [Item1, Item2, Item3]
@@ -49,21 +49,22 @@ app.get("/", (req, res) => {
 
   Item.find({}, (err, foundItems) => {
 
-  if (foundItems.length === 0) {
-    Item.insertMany(defaultItems, (err) => {
-      if(err) {
-        console.log(err)
-      } else {
-        console.log('Items added to DB')
-      }
-    })
-    res.redirect('/')
-  } else {
-    res.render('list', { 
-      listTitle: 'Today',
-      newListItems: foundItems
-    })
-  }
+    if (foundItems.length === 0) {
+      Item.insertMany(defaultItems, (err) => {
+        if(err) {
+          console.log(err)
+        } else {
+          console.log('Initial items added to DB')
+        }
+      })
+      res.redirect('/')
+    } else {
+      res.render('list', { 
+        listTitle: 'Today',
+        newListItems: foundItems
+      })
+    }
+  })
 })
       
 
@@ -111,7 +112,6 @@ app.post('/', (req, res) => {
   }
 })
 
-
 app.post('/delete', async (req, res) => {
   const checkedItemId = req.body.checkbox
   const listName = req.body.listName
@@ -130,4 +130,4 @@ app.post('/delete', async (req, res) => {
 
 app.listen(3000, function(){
   console.log("Server started on port 3000.");
-});
+})
